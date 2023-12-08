@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout/layout :: head(${FreeboardReq.fr_title})}">
+    <!-- 추가적인 스타일링을 위한 CSS 파일 연결 -->
+    <link rel="stylesheet" href="your-custom-style.css">
+    <style>
+        h1 {font-size: 10px;}
+    </style>
+</head>
+<body>
+<nav th:replace="~{layout/layout :: nav('Freeboard')}"></nav>
+<div class="container p-3">
+
+    <div class="row" style="outline: 1px solid lightgray;">
+        <div class="col">
+            <!-- 테이블 형식의 게시글 목록 -->
+            <table class="table">
+                <thead>
+                <tr>
+                    <th colspan="4"> 제목: <span th:text="${FreeboardReq.fr_title}"></span></th>
+                    <td colspan="2" class="text-end">
+                        조회수: <span th:text="${FreeboardReq.view_count}"></span>
+                    </td>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td colspan="2">
+                        작성자: <span th:text="${FreeboardReq.mbr_nick}"></span>
+                    </td>
+                    <td colspan="2"></td> <!-- 등록일 칸 추가 -->
+                    <td colspan="2" class="text-end">
+                        등록일: <span
+                            th:text="${#temporals.format(FreeboardReq.created_at, 'yyyy-MM-dd HH:mm:ss')}"></span>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+
+            <!-- 내용 칸 -->
+            <div class="mb-3" style="margin-left: -10px;">
+                <label class="form-label" style="margin-left: 20px;">내용</label>
+                <div class="border p-3 m-3" th:text="${FreeboardReq.fr_content}"></div>
+            </div>
+            <!-- 버튼 그룹 -->
+            <div class="mb-3 row justify-content-between">
+                <div class="col-3">
+                    <a th:href="@{'/Freeboard/updateform?fr_idx=' + ${FreeboardReq.fr_idx}}"
+                       class="btn btn-dark">수정</a>
+                </div>
+                <div class="col-3 text-end">
+                    <a th:href="@{/Freeboard/list(pageNum=1)}" class="btn btn-dark">목록</a>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<!-- 뒤로가기 감지를 위한 스크립트 -->
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    $(document).ready(function () {
+        // 뒤로가기 이벤트 감지
+        window.addEventListener('popstate', function () {
+            // 현재 URL에서 fr_idx 파라미터 값을 가져옴
+            var fr_idx = getParameterByName('fr_idx');
+
+            // fr_idx가 존재하면 서버에 조회수 증가 요청
+            if (fr_idx) {
+                increaseViewCount(fr_idx);
+            }
+        });
+
+        // 페이지 로드 시 조회수 증가 요청
+        var fr_idx = getParameterByName('fr_idx');
+        if (fr_idx) {
+            increaseViewCount(fr_idx);
+        }
+
+        // URL에서 파라미터 값을 가져오는 함수
+        function getParameterByName(name, url) {
+            if (!url) url = window.location.href;
+            name = name.replace(/[\[\]]/g, '\\$&');
+            var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
+                results = regex.exec(url);
+            if (!results) return null;
+            if (!results[2]) return '';
+            return decodeURIComponent(results[2].replace(/\+/g, ' '));
+        }
+
+        // 조회수 증가 요청을 서버에 보내는 함수
+        function increaseViewCount(fr_idx) {
+            // Ajax를 이용한 서버 통신
+            $.ajax({
+                url: '/Freeboard/increaseViewCount',
+                type: 'post',
+                contentType: 'application/json',
+                dataType: 'json',
+                data: JSON.stringify({ fr_idx: fr_idx }),
+                success: function (res) {
+                    // 성공적으로 처리된 경우에는 적절한 로직을 추가
+                },
+                error: function (e) {
+                    console.log(e);
+                }
+            });
+        }
+    });
+    /*]]>*/
+</script>
+
+</body>
+</html>

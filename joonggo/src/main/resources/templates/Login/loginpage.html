@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout/layout :: head('로그인')}">
+</head>
+<body>
+<nav th:replace="~{layout/layout :: nav('home')}"></nav>
+<header th:replace="~{layout/layout :: header('home')}"></header>
+
+    <div class="container p-3" style="width:450px;" >
+
+        <!--로그인 타이틀-->
+        <div class="mb-3" style="display: flex; align-items: center; justify-content: center;">
+            <div class="container" style="text-align: center; font-size: 35px; margin: auto;">
+                <label class="form-label" style="font-weight: bold;">로그인</label>
+            </div>
+        </div>
+
+        <form th:action="@{/}" method="post" th:object="${LoginReq}" enctype="multipart/form-data">
+            <!--아이디 입력-->
+            <div class="row">
+                <label for="mbr_id" class="col-sm-3 form-label text-left d-flex align-items-center">
+                    아이디
+                </label>
+                <div class="col-sm-9 mb-3">
+                    <input type="text" class="form-control" id="mbr_id" name="mbr_id" placeholder="ID를 입력해주세요"
+                           style="border-color: #80A6FF;" minlength="4" maxlength="16" required>
+                </div>
+            </div>
+
+            <!--비밀번호 입력-->
+            <div class="row">
+                <label for="mbr_pwd" class="col-sm-3 form-label text-left d-flex align-items-center">
+                    비밀번호
+                </label>
+                <div class="col-sm-9 mb-3">
+                    <input type="password" class="form-control" id="mbr_pwd" name="mbr_pwd" placeholder="Pass Word를 입력해주세요"
+                           style="border-color: #80A6FF" minlength="6" maxlength="20" required>
+                </div>
+            </div>
+
+            <!--미입력 안내문-->
+            <div class="row" style="text-align: center; margin-bottom: 15px; color:red;">
+                <div class="d-flex justify-content-end" id="login_info" style="text-align: center; height: 20px;"></div>
+            </div>
+
+            <!--로그인 버튼-->
+            <div class="row mt-3 mb-3">
+                <div class="col-sm-12 d-flex justify-content-end">
+                    <button type="button" class="btn btn-primary " style="width:308px" onclick="login()">로그인</button>
+                </div>
+            </div>
+
+        </form>
+
+        <!--다른페이지 이동링크-->
+        <div class="row mb-3 ">
+            <div class="col-sm-6 mt-3 d-flex justify-content-end">
+                <a> </a>
+            </div>
+            <div class="col-sm-3 mt-3 d-flex justify-content-end">
+                <a class="nav-link" th:href="@{/Find/findpage}" style="font-weight: bold;">계정찾기</a>
+            </div>
+            <div class="col-sm-3 mt-3 d-flex justify-content-end">
+                <a class="nav-link" th:href="@{/Join/joinpage}" style="font-weight: bold;">회원가입</a>
+            </div>
+        </div>
+
+    </div>
+
+<script>
+    var onsub = false;
+
+    function login() {
+        var login_info = $('#login_info');
+        $.ajax({
+            url: '/Login/loginnig',
+            data: {
+                mbr_id: $('#mbr_id').val(),
+                mbr_pwd: $('#mbr_pwd').val()
+            },
+            success: function (res) {
+                if (res.includes('로그인 실패')) {
+                    // 로그인 실패 시 처리
+                    onsub = false;
+                    login_info.text('아이디 또는 비밀번호를 다시 확인해주세요.');
+                }
+                else if (res.includes(' 입력')) {
+                    // 로그인 실패 시 처리
+                    onsub = false;
+                    login_info.text(res);
+                }
+                else {
+                    // 로그인 성공 시 처리
+                    login_info.text(null);
+                    var userInfo = JSON.parse(res);
+                    sessionStorage.setItem('mbr_idx', userInfo.mbr_idx);
+                    sessionStorage.setItem('mbr_nick', userInfo.mbr_nick);
+                    var mbr_nick = sessionStorage.getItem('mbr_nick');
+                    onsub = true;
+                    alert(mbr_nick+'님 환영합니다.');
+                    console.log('로그인 정보:', userInfo);
+                    window.location.href = '/';
+                }
+            }
+        });
+    }
+</script>
+</body>
+</html>

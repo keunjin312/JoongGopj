@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout/layout :: head('Freeboard')}">
+</head>
+<body>
+<nav th:replace="~{layout/layout :: nav('Freeboard')}"></nav>
+<div class="container p-3">
+    <h1>FreeBoard > updateForm</h1>
+    <div class="row">
+        <div class="col">
+            <form action="/Freeboard/updateproc" method="post" th:object="${FreeboardReq}">
+                <input type="hidden" th:field="*{fr_idx}"/>
+                <div class="mb-3">
+                    <label for="title" class="form-label">Title</label>
+                    <input type="text" name="title" id="title" placeholder="title"
+                           th:field="*{fr_title}"
+                           th:class="${#fields.hasErrors('title')}? 'form-control is-invalid':'form-control' "
+                           th:classappend="${first != 'true'} ? 'is-valid'" />
+                    <p th:if="${#fields.hasErrors('title')}" th:errors="*{fr_title}" class="invalid-feedback"></p>
+                </div>
+                <div class="mb-3">
+                    <label for="content" class="form-label">Content</label>
+                    <textarea name="content" class="form-control fieldError" id="content" rows="3"
+                              th:field="*{fr_content}"
+                              th:class="${#fields.hasErrors('content')}? 'form-control is-invalid':'form-control' "
+                              th:classappend="${first != 'true'} ? 'is-valid'" ></textarea>
+                    <p th:if="${#fields.hasErrors('content')}" th:errors="*{fr_content}" class="invalid-feedback"></p>
+                </div>
+                <div class="mb-3 row justify-content-between">
+                    <div class="col-3">
+                        <a th:href="@{/Freeboard/list(pageNum=1)}" class="btn btn-dark">목록</a>
+                    </div>
+                    <div class="col-3 d-flex justify-content-end">
+                        <input type="submit" class="btn btn-dark" value="저장"/>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+</html>

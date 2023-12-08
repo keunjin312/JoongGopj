@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout/layout :: head('삽니다')}">
+</head>
+<body>
+<nav th:replace="~{layout/layout :: nav('home')}"></nav>
+<!-- Navigation-->
+<!-- Header-->
+<header th:replace="~{layout/layout :: header('home')}"></header>
+<!-- Section-->
+<section class="py-5">
+    <div class="container px-4 px-lg-5 mt-0">
+        <div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
+            <div th:each="TradeboardReq : ${BuyAlllist}"class="col-lg-3 col-md-6 mb-4">
+                <div class="team-item text-center rounded overflow-hidden">
+                    <div class="col" th:data-tb-idx="${TradeboardReq.tb_idx}" onclick="handleImageClick(this)">
+                        <div class="rounded-circle overflow-hidden m-2" style="width: 100%; height: 100%; display: flex; justify-content: center; align-items: center;">
+                            <img class="card-img" th:src="@{'/images/' + ${TradeboardReq.img_name}}" alt="..." th:idx="${TradeboardReq.tb_idx}"
+                                 style="width: 160px; height: 160px; object-fit: fit; "/>
+                        </div>
+                        <div class="text-center">
+                            <h5 class="mb-0" th:text="${TradeboardReq.tb_title}" style="height:48px">상품명</h5>
+                            <small th:text="${TradeboardReq.tb_price}+원">$0.00</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="d-flex justify-content-end mb-3 mt-3" >
+            <a th:href="@{/Trade/writeForm}" class="btn btn-primary" id="WriteForm_buy">글 작성</a>
+        </div>
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+            checkLoginStatus2();
+        });
+
+        function checkLoginStatus2() {
+            var mbr_idx = sessionStorage.getItem('mbr_idx');
+            var mbr_nick = sessionStorage.getItem('mbr_nick');
+            if (mbr_idx == null) {
+                hideWriteForm_buy();
+            } else {
+                showWriteForm_buy();
+            }
+        }
+
+        function showWriteForm_buy() {
+            document.getElementById('WriteForm_buy').style.display = 'block';
+        }
+
+        function hideWriteForm_buy() {
+            document.getElementById('WriteForm_buy').style.display = 'none';
+        }
+
+        function handleImageClick(element) {
+             var tbIdx = element.getAttribute("data-tb-idx");
+             fetch("/Trade/getTradeboardInfo?tb_idx=" + tbIdx)
+               .then(response => response.json())
+               .then(data => { window.location.href = "/Trade/productdetail?tb_idx=" + tbIdx;   })
+               .catch(error => console.error('Error fetching tradeboard info:', error));
+          }
+
+        </script>
+        <div class="row">
+            <div class="col d-flex justify-content-center">
+                <nav aria-label="Page navigation example">
+                    <ul class="pagination">
+                        <li class="page-item">
+                            <a class="page-link" th:href="@{/Trade/buylist(BuypageNum=${BuypageNum-1})}"
+                               th:classappend="${BuypageNum} == 1 ? 'disabled'" aria-label="Previous">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+                        <li th:each="i:${#numbers.sequence(1, countBuyPage)}" class="page-item">
+                            <a class="page-link" th:href="@{/Trade/buylist(BuypageNum=${i})}"
+                               th:classappend="${#strings.replace(param.BuypageNum, ' ', '')} == ${i} ? 'active' : ''"
+                            >[[ ${i} ]]</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" th:href="@{/Trade/buylist(BuypageNum=${BuypageNum+1})}"
+                               th:classappend="${BuypageNum} == ${countBuyPage} ? 'disabled'" aria-label="Next">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- Footer-->
+<footer class="py-5 bg-dark">
+    <div class="container"><p class="m-0 text-center text-white">Copyright &copy; Your Website 2023</p></div>
+</footer>
+<!-- Bootstrap core JS-->
+<!-- Core theme JS-->
+<script src="/js/scripts.js"></script>
+</body>
+</html>
